@@ -36,7 +36,7 @@ namespace Webinar.Web.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Login(LoginModel model, string returnUrl)
         {
-            if (ModelState.IsValid && WebSecurity.Login(model.UserName, model.Password, persistCookie: model.RememberMe))
+            if (ModelState.IsValid && Membership.ValidateUser(model.UserName, model.Password))
             {
                 return RedirectToLocal(returnUrl);
             }
@@ -80,8 +80,10 @@ namespace Webinar.Web.Controllers
                 // Attempt to register the user
                 try
                 {
-                    WebSecurity.CreateUserAndAccount(model.UserName, model.Password, propertyValues: new { UserId = Guid.NewGuid() });
-                    WebSecurity.Login(model.UserName, model.Password);
+                    Membership.CreateUser(model.UserName, model.Password);
+                    Membership.ValidateUser(model.UserName, model.Password);
+                    //WebSecurity.CreateUserAndAccount(model.UserName, model.Password, propertyValues: new { UserId = Guid.NewGuid() });
+                    //WebSecurity.Login(model.UserName, model.Password);
                     return RedirectToAction("Index", "Home");
                 }
                 catch (MembershipCreateUserException e)
